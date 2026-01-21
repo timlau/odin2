@@ -44,7 +44,7 @@ void OdinButton::paintButton(juce::Graphics &g, bool p_highlight, bool p_pressed
 		}
 
 		g.setColour(p_highlight ? spline_highlight_colour : spline_accent_colour);
-		g.setFont(juce::Font(H * 0.6f, 1));
+		g.setFont(juce::Font(FontOptions(H * 0.6f, 1)));
 		g.drawText(m_button_text, getLocalBounds(), juce::Justification::centred, false);
 
 		return;

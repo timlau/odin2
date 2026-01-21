@@ -24,12 +24,13 @@ void OdinAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &mi
 
 	// get BPM info from host
 	if (AudioPlayHead *playhead = getPlayHead()) {
-		AudioPlayHead::CurrentPositionInfo current_position_info;
-		playhead->getCurrentPosition(current_position_info);
-		if (m_BPM != current_position_info.bpm) {
-			m_value_tree.state.getChildWithName("misc").setProperty("BPM", m_BPM, nullptr);
+		auto current_position_info = playhead->getPosition();
+		if (current_position_info) {
+			if (m_BPM != *current_position_info->getBpm()) {
+				m_value_tree.state.getChildWithName("misc").setProperty("BPM", m_BPM, nullptr);
+			}
+			m_BPM = *current_position_info->getBpm();
 		}
-		m_BPM = current_position_info.bpm;
 	}
 	setBPM(m_BPM);
 
@@ -67,22 +68,17 @@ void OdinAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &mi
 		//======================= SMOOTHING ==========================
 		//============================================================
 		for (int i = 0; i < 3; ++i) {
-			m_osc_vol_smooth[i] =
-			    m_osc_vol_smooth[i] * GAIN_SMOOTHIN_FACTOR + (1.f - GAIN_SMOOTHIN_FACTOR) * m_osc_vol_control[i];
-			m_fil_gain_smooth[i] =
-			    m_fil_gain_smooth[i] * GAIN_SMOOTHIN_FACTOR + (1.f - GAIN_SMOOTHIN_FACTOR) * m_fil_gain_control[i];
+			m_osc_vol_smooth[i]  = m_osc_vol_smooth[i] * GAIN_SMOOTHIN_FACTOR + (1.f - GAIN_SMOOTHIN_FACTOR) * m_osc_vol_control[i];
+			m_fil_gain_smooth[i] = m_fil_gain_smooth[i] * GAIN_SMOOTHIN_FACTOR + (1.f - GAIN_SMOOTHIN_FACTOR) * m_fil_gain_control[i];
 
-			m_fil_freq_smooth[i] = m_fil_freq_smooth[i] * FILTER_FREQ_SMOOTHING_FACTOR +
-			                       (1.f - FILTER_FREQ_SMOOTHING_FACTOR) * m_fil_freq_control[i];
+			m_fil_freq_smooth[i] = m_fil_freq_smooth[i] * FILTER_FREQ_SMOOTHING_FACTOR + (1.f - FILTER_FREQ_SMOOTHING_FACTOR) * m_fil_freq_control[i];
 		}
 
-		m_pitch_bend_smooth =
-		    m_pitch_bend_smooth * PITCHBEND_SMOOTHIN_FACTOR + (1.f - PITCHBEND_SMOOTHIN_FACTOR) * (*m_pitchbend);
+		m_pitch_bend_smooth = m_pitch_bend_smooth * PITCHBEND_SMOOTHIN_FACTOR + (1.f - PITCHBEND_SMOOTHIN_FACTOR) * (*m_pitchbend);
 
 		m_pitch_bend_smooth_and_applied = m_pitch_bend_smooth * m_pitchbend_amount;
 
-		m_modwheel_smooth =
-		    m_modwheel_smooth * PITCHBEND_SMOOTHIN_FACTOR + (1.f - PITCHBEND_SMOOTHIN_FACTOR) * (*m_modwheel);
+		m_modwheel_smooth = m_modwheel_smooth * PITCHBEND_SMOOTHIN_FACTOR + (1.f - PITCHBEND_SMOOTHIN_FACTOR) * (*m_modwheel);
 
 		m_x_smooth = m_x_smooth * PAD_SMOOTHIN_FACTOR + (1.f - PAD_SMOOTHIN_FACTOR) * (*m_xy_x);
 		m_y_smooth = m_y_smooth * PAD_SMOOTHIN_FACTOR + (1.f - PAD_SMOOTHIN_FACTOR) * (*m_xy_y);
@@ -174,8 +170,7 @@ void OdinAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &mi
 					case OSC_TYPE_WAVETABLE:
 						m_voice[voice].wavetable_osc[osc].update();
 						//set modulation envelope/lfo
-						m_voice[voice].wavetable_osc[osc].setPosModValue(
-						    m_osc_wavetable_source_lfo[osc] ? m_lfo[voice][0] : m_adsr[voice][2]);
+						m_voice[voice].wavetable_osc[osc].setPosModValue(m_osc_wavetable_source_lfo[osc] ? m_lfo[voice][0] : m_adsr[voice][2]);
 						m_osc_output[voice][osc] += m_voice[voice].wavetable_osc[osc].doOscillateWithSync();
 						break;
 					case OSC_TYPE_MULTI:
@@ -315,13 +310,11 @@ void OdinAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &mi
 								if (m_fil_gain_smooth[fil] > MINUS_12_dB_GAIN) {
 									// volume level above -12dB, modulate to plus 12 dB
 									fil_vol_modded *= pow(PLUS_12_dB_GAIN, *m_fil_12_vol_mod[voice][fil]);
-									fil_vol_modded =
-									    fil_vol_modded > PLUS_12_dB_GAIN ? PLUS_12_dB_GAIN : fil_vol_modded;
+									fil_vol_modded = fil_vol_modded > PLUS_12_dB_GAIN ? PLUS_12_dB_GAIN : fil_vol_modded;
 								} else {
 									// if volume level is below -12dB then just modulate up to 0dB
 									fil_vol_modded += (1.f - fil_vol_modded) * *m_fil_12_vol_mod[voice][fil];
-									fil_vol_modded =
-									    fil_vol_modded > PLUS_12_dB_GAIN ? PLUS_12_dB_GAIN : fil_vol_modded;
+									fil_vol_modded = fil_vol_modded > PLUS_12_dB_GAIN ? PLUS_12_dB_GAIN : fil_vol_modded;
 								}
 							}
 						}
@@ -359,7 +352,7 @@ void OdinAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &mi
 				stereo_signal[0] += stereo_signal_voice[0] * m_adsr[voice][0];
 				stereo_signal[1] += stereo_signal_voice[1] * m_adsr[voice][0];
 			} // voice active
-		}     // voice loop
+		} // voice loop
 
 		for (int channel = 0; channel < 2; ++channel) {
 

@@ -360,6 +360,7 @@ public:
 		p_size *= 0.81f; // for some reason the font is just larget on mac...
 #endif
 		static auto typeface_aldrich = Typeface::createSystemTypefaceFor(BinaryData::aldrich_regular_ttf, BinaryData::aldrich_regular_ttfSize);
-		return Font(typeface_aldrich).withHeight(p_size);
+		static auto font_options = FontOptions(typeface_aldrich);
+		return Font(font_options).withHeight(p_size);
 	}
 };
