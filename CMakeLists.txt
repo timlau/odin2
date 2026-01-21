@@ -4,13 +4,11 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET 10.11 CACHE STRING "Minimum macOS version")
 project(Odin2 VERSION 2.4.1 LANGUAGES C CXX ASM)
 
 # ================== CMake Subdirs ======================
-add_subdirectory(libs/clap-juce-extensions EXCLUDE_FROM_ALL)
-if(UNIX AND NOT APPLE)
-  add_subdirectory(libs/JUCELV2 EXCLUDE_FROM_ALL)
-else()
-  add_subdirectory(libs/JUCE EXCLUDE_FROM_ALL)
-endif()
 
+include(cmake/CPM.cmake)
+# Dependencies
+CPMAddPackage("gh:/juce-framework/JUCE#8.0.6")
+CPMAddPackage("gh:/free-audio/clap-juce-extensions#main")
 # ================= Git Commit Hash =====================
 find_package(Git)
 if (Git_FOUND)
@@ -52,8 +50,7 @@ juce_add_plugin(Odin2
   IS_SYNTH TRUE
   NEEDS_MIDI_INPUT TRUE
   COPY_PLUGIN_AFTER_BUILD ${ODIN2_COPY_PLUGIN_AFTER_BUILD}
-  LV2_URI https://thewavewarden.com/odin2
-  LV2_SHARED_LIBRARY_NAME Odin2
+  LV2URI https://thewavewarden.com/odin2
 )
 
 # ==================== CLAP =======================
