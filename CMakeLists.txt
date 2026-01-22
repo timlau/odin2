@@ -3,23 +3,38 @@ cmake_minimum_required(VERSION 3.15)
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.11 CACHE STRING "Minimum macOS version")
 project(Odin2 VERSION 2.4.1 LANGUAGES C CXX ASM)
 
+option(ODIN2_USE_CPM "Get JUCE and clap-juce-extensions using CPM" OFF)
+
 # ================== CMake Subdirs ======================
 
-include(cmake/CPM.cmake)
-# Dependencies
-CPMAddPackage("gh:/juce-framework/JUCE#8.0.6")
-CPMAddPackage("gh:/free-audio/clap-juce-extensions#main")
+if(ODIN2_USE_CPM)
+  message("== Using CPM to get dependencies")
+  include(cmake/CPM.cmake)
+  # Dependencies
+  CPMAddPackage("gh:/juce-framework/JUCE#8.0.11")
+  CPMAddPackage("gh:/free-audio/clap-juce-extensions#main")
+else()
+  message("== Using JUCE and clap-juce-extensions")
+  if(UNIX AND NOT APPLE)
+    add_subdirectory(libs/JUCELV2)
+  else()
+    add_subdirectory(libs/JUCE)
+  endif()
+
+  add_subdirectory(libs/clap-juce-extensions)
+endif()
+
 # ================= Git Commit Hash =====================
 find_package(Git)
-if (Git_FOUND)
-    execute_process(
-            COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-            OUTPUT_VARIABLE GIT_HASH
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
+if(Git_FOUND)
+  execute_process(
+    COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_HASH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
 else()
-    set(GIT_HASH "deadbeef")
+  set(GIT_HASH "deadbeef")
 endif()
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/include")
 file(WRITE "${CMAKE_BINARY_DIR}/include/GitCommitId.h" "#define GIT_COMMIT_ID \"${GIT_HASH}\"")
@@ -36,7 +51,7 @@ add_compile_definitions(
 # Build LV2 only on Linux
 set(JUCE_FORMATS AU VST3 Standalone)
 if(UNIX AND NOT APPLE)
-    list(APPEND JUCE_FORMATS LV2)
+  list(APPEND JUCE_FORMATS LV2)
 endif()
 
 juce_add_plugin(Odin2
@@ -71,32 +86,32 @@ target_compile_definitions(Odin2
 )
 
 # ==================== Check OS =======================
-target_include_directories(Odin2 
-  PRIVATE 
-    ${CMAKE_BINARY_DIR}/include 
+target_include_directories(Odin2
+  PRIVATE
+    ${CMAKE_BINARY_DIR}/include
     libs/tuning-library
     libs/json/include
 )
 
 if(APPLE)
-    target_compile_definitions(Odin2 PRIVATE ODIN_MAC=1)
-    target_compile_options(Odin2 PRIVATE "-Wno-implicit-float-conversion")
-    message("== Building for MacOS")
+  target_compile_definitions(Odin2 PRIVATE ODIN_MAC=1)
+  target_compile_options(Odin2 PRIVATE "-Wno-implicit-float-conversion")
+  message("== Building for MacOS")
 elseif(UNIX AND NOT APPLE)
-    target_compile_definitions(Odin2 PRIVATE ODIN_LINUX=1)
-    message("== Building for Linux")
+  target_compile_definitions(Odin2 PRIVATE ODIN_LINUX=1)
+  message("== Building for Linux")
 else()
-    target_compile_definitions(Odin2 PRIVATE ODIN_WIN=1)
-    message("== Building for Windows")
+  target_compile_definitions(Odin2 PRIVATE ODIN_WIN=1)
+  message("== Building for Windows")
 endif()
 
 # ==================== Debug / Release =======================
 
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    message("== Building configuration Debug")
-    target_compile_definitions(Odin2 PRIVATE ODIN_DEBUG=1)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  message("== Building configuration Debug")
+  target_compile_definitions(Odin2 PRIVATE ODIN_DEBUG=1)
 else()
-    message("== Building configuration Release")
+  message("== Building configuration Release")
 endif()
 
 # ==================== Source Files =======================
