@@ -67,7 +67,7 @@ target_compile_definitions(Odin2
     JUCE_VST3_CAN_REPLACE_VST2=0
     JUCE_WEB_BROWSER=0
     JUCE_MODAL_LOOPS_PERMITTED=1
-    JUCE_DISPLAY_SPLASH_SCREEN=0
+    # JUCE_DISPLAY_SPLASH_SCREEN=0
 )
 
 # ==================== Check OS =======================
