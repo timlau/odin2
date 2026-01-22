@@ -570,7 +570,7 @@ void PatchBrowserSelector::setType(BrowserType p_type) {
 void PatchBrowserSelector::resized() {
 
 	m_button_feels.setButtonFontSize(H / 14.0f);
-	m_input_field.setFont(H / 15.0f);
+	m_input_field.setFont(juce::FontOptions(H / 15.0f));
 
 	GET_LOCAL_AREA(m_left_button, "PresetLeftButton");
 	m_right_button.setBounds(m_left_button.getBounds().withRightX(W));

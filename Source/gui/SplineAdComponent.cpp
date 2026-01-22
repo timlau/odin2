@@ -74,7 +74,7 @@ void SplineAdComponent::paint(Graphics &g) {
 	g.setColour(juce::Colours::black.withAlpha(0.4f));
 	g.fillRoundedRectangle(m_discount_code.getBounds().toFloat(), 5.0f);
 	g.setColour(juce::Colour(0xfff2960b));
-	g.setFont(juce::Font(m_discount_code.getHeight() * 0.6f, 1));
+	g.setFont(juce::Font(juce::FontOptions(m_discount_code.getHeight() * 0.6f, 1)));
 	g.drawText(DISCOUNT_CODE, m_discount_code.getBounds(), juce::Justification::centred, false);
 }
 
