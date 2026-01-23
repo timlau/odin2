@@ -356,11 +356,11 @@ public:
 class Helpers {
 public:
 	static const Font getAldrichFont(float p_size) {
-#ifdef ODIN_MAC
+#if defined(ODIN_MAC) || defined(ODIN_LINUX)
 		p_size *= 0.81f; // for some reason the font is just larget on mac...
 #endif
 		static auto typeface_aldrich = Typeface::createSystemTypefaceFor(BinaryData::aldrich_regular_ttf, BinaryData::aldrich_regular_ttfSize);
-		static auto font_options = FontOptions(typeface_aldrich);
+		static auto font_options     = FontOptions(typeface_aldrich);
 		return Font(font_options).withHeight(p_size);
 	}
 };
