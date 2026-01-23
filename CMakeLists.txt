@@ -13,6 +13,8 @@ if(ODIN2_USE_CPM)
   # Dependencies
   CPMAddPackage("gh:/juce-framework/JUCE#8.0.11")
   CPMAddPackage("gh:/free-audio/clap-juce-extensions#main")
+  CPMAddPackage("gh:/nlohmann/json#3.12.0")
+  CPMAddPackage("gh:/surge-synthesizer/tuning-library#main")
 else()
   message("== Using JUCE and clap-juce-extensions sub-modules")
   if(UNIX AND NOT APPLE)
@@ -89,20 +91,23 @@ target_compile_definitions(Odin2
 target_include_directories(Odin2
   PRIVATE
     ${CMAKE_BINARY_DIR}/include
+if(NOT ODIN2_USE_CPM)
+    libs/clap-juce-extensions/include
     libs/tuning-library
     libs/json/include
+endif()
 )
 
-if(APPLE)
-  target_compile_definitions(Odin2 PRIVATE ODIN_MAC=1)
-  target_compile_options(Odin2 PRIVATE "-Wno-implicit-float-conversion")
-  message("== Building for MacOS")
+it(APPLE)
+target_compile_definitions(Odin2 PRIVATE ODIN_MAC=1)
+target_compile_options(Odin2 PRIVATE "-Wno-implicit-float-conversion")
+message("== Building for MacOS")
 elseif(UNIX AND NOT APPLE)
-  target_compile_definitions(Odin2 PRIVATE ODIN_LINUX=1)
-  message("== Building for Linux")
+target_compile_definitions(Odin2 PRIVATE ODIN_LINUX=1)
+message("== Building for Linux")
 else()
-  target_compile_definitions(Odin2 PRIVATE ODIN_WIN=1)
-  message("== Building for Windows")
+target_compile_definitions(Odin2 PRIVATE ODIN_WIN=1)
+message("== Building for Windows")
 endif()
 
 # ==================== Debug / Release =======================
