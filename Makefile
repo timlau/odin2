@@ -15,11 +15,14 @@ clean:
 setup:
 	cmake -B ${BUILD_DIR} -S . -D CMAKE_BUILD_TYPE=${BUILD_TYPE} ${BUILD_OPTIONS}
 
-# Used locally install liba, if they exist
+# Used locally install libs, if they exist
 setup-local:
 	cmake -B ${BUILD_DIR} -S . -D CMAKE_BUILD_TYPE=${BUILD_TYPE} ${BUILD_OPTIONS} -DCPM_USE_LOCAL_PACKAGES=ON
 
-build:
+build: setup
+	cmake --build ${BUILD_DIR} --config ${BUILD_TYPE}
+
+build-local: setup-local
 	cmake --build ${BUILD_DIR} --config ${BUILD_TYPE}
 
 run:
