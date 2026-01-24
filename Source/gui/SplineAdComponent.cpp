@@ -84,5 +84,5 @@ void SplineAdComponent::resized() {
 	GET_LOCAL_AREA(m_discount_code, "SplineAdDiscountCode");
 	GET_LOCAL_AREA(m_copy_clipboard_button, "SplineAdCopyClipboard");
 
-	m_discount_code.applyFontToAllText(juce::Font(m_discount_code.getHeight() * 0.75f));
+	m_discount_code.applyFontToAllText(juce::Font(juce::FontOptions(m_discount_code.getHeight() * 0.75f)));
 }

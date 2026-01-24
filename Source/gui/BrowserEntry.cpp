@@ -65,7 +65,7 @@ void BrowserEntry::paint(Graphics &g) {
 
 void BrowserEntry::resized() {
 	m_rename_editor.setBounds(0, 0, getWidth(), getHeight());
-	m_rename_editor.setFont(H / 1.4f);
+	m_rename_editor.setFont(juce::FontOptions(H / 1.4f));
 	m_rename_editor.setIndents(W / 20.0f, H / 10.0f);
 }
 
