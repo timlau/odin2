@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.15)
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.11 CACHE STRING "Minimum macOS version")
 project(Odin2 VERSION 2.4.1 LANGUAGES C CXX ASM)
 
+set(CMAKE_CXX_STANDARD 17 )
+
 option(ODIN2_USE_CPM "Get JUCE and clap-juce-extensions using CPM" OFF)
 
 # ================== CMake Subdirs ======================
@@ -13,7 +15,7 @@ if(ODIN2_USE_CPM)
   # Dependencies
   CPMAddPackage("gh:/juce-framework/JUCE#8.0.11")
   CPMAddPackage("gh:/free-audio/clap-juce-extensions#main")
-  CPMAddPackage("gh:/surge-synthesizer/tuning-library#main")
+  CPMAddPackage("gh:/surge-synthesizer/tuning-library#last_cpp17")
   CPMAddPackage(
     NAME nlohmann_json
     GITHUB_REPOSITORY nlohmann/json
@@ -104,6 +106,9 @@ else()
   target_include_directories(Odin2
   PRIVATE
     ${CMAKE_BINARY_DIR}/include
+    ${clap-juce-extensions}/include
+    ${tuning-library_SOURCE_DIR}
+    ${nlohmann_json_SOURCE_DIR}/include
   )
 endif()
 

@@ -23,7 +23,13 @@ build: setup
 	cmake --build ${BUILD_DIR} --config ${BUILD_TYPE}
 
 build-local: setup-local
-	cmake --build ${BUILD_DIR} --config ${BUILD_TYPE}
+	cmake --build ${BUILD_DIR} --config ${BUILD_TYPE} 
+
+build-standalone: setup-local
+	cmake --build ${BUILD_DIR} --config ${BUILD_TYPE} --target ${NAME}_Standalone
+
+build-clap: setup-local
+	cmake --build ${BUILD_DIR} --config ${BUILD_TYPE} --target ${NAME}_CLAP
 
 run:
 	./${BUILD_DIR}/Odin2_artefacts/${BUILD_TYPE}/Standalone/${NAME}
