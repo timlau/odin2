@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../libs/json/include/nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 #include "../GlobalIncludes.h"
 #include "GuiDataEditor.h"
 
