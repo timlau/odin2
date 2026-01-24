@@ -3,14 +3,10 @@ cmake_minimum_required(VERSION 3.15)
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.11 CACHE STRING "Minimum macOS version")
 project(Odin2 VERSION 2.4.1 LANGUAGES C CXX ASM)
 
-set(CMAKE_CXX_STANDARD 17 )
-
-option(ODIN2_USE_CPM "Get JUCE and clap-juce-extensions using CPM" OFF)
+set(CMAKE_CXX_STANDARD 20)
 
 # ================== CMake Subdirs ======================
 
-if(ODIN2_USE_CPM)
-  message("== Using CPM to get dependencies")
   include(cmake/CPM.cmake)
   # Dependencies
   CPMAddPackage("gh:/juce-framework/JUCE#8.0.11")
@@ -21,16 +17,6 @@ if(ODIN2_USE_CPM)
     GITHUB_REPOSITORY nlohmann/json
     VERSION 3.12.0
   )
-else()
-  message("== Using JUCE and clap-juce-extensions sub-modules")
-  if(UNIX AND NOT APPLE)
-    add_subdirectory(libs/JUCELV2)
-  else()
-    add_subdirectory(libs/JUCE)
-  endif()
-
-  add_subdirectory(libs/clap-juce-extensions)
-endif()
 
 # ================= Git Commit Hash =====================
 find_package(Git)
@@ -94,15 +80,6 @@ target_compile_definitions(Odin2
 )
 
 # ==================== Check OS =======================
-if(NOT ODIN2_USE_CPM)
-  target_include_directories(Odin2
-  PRIVATE
-    ${CMAKE_BINARY_DIR}/include
-    libs/clap-juce-extensions/include
-    libs/tuning-library
-    libs/json/include
-  )
-else()
   target_include_directories(Odin2
   PRIVATE
     ${CMAKE_BINARY_DIR}/include
@@ -110,7 +87,6 @@ else()
     ${tuning-library_SOURCE_DIR}
     ${nlohmann_json_SOURCE_DIR}/include
   )
-endif()
 
 if(APPLE)
   target_compile_definitions(Odin2 PRIVATE ODIN_MAC=1)
