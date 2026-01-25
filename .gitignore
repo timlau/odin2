@@ -9,3 +9,5 @@ cmake-build-*
 .idea/
 build/
 .clangd
+.cache
+compile_commands.json
