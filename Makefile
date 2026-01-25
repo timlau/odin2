@@ -2,6 +2,8 @@ NAME = Odin2
 BUILD_OPTIONS = -D ODIN2_COPY_PLUGIN_AFTER_BUILD=OFF
 BUILD_DIR = cmake-build-${NAME}
 BUILD_TYPE = Release
+CXX_FLAGS := "${CXX_FLAGS} -Wp,-D_GLIBCXX_ASSERTIONS"
+
 
 all: build
 
@@ -29,7 +31,7 @@ build-local: setup-local
 	cmake --build ${BUILD_DIR} --config ${BUILD_TYPE}
 
 build-standalone: setup-local
-	cmake --build ${BUILD_DIR} --config ${BUILD_TYPE} --target ${NAME}_Standalone
+	cmake --build ${BUILD_DIR} --config ${BUILD_TYPE} --target ${NAME}_Standalone --verbose
 
 build-clap: setup-local
 	cmake --build ${BUILD_DIR} --config ${BUILD_TYPE} --target ${NAME}_CLAP
@@ -47,4 +49,7 @@ run:
 run-debug:
 	./${BUILD_DIR}/Odin2_artefacts/Debug/Standalone/${NAME}
 
-PHONY: all init-submodules clean setup build setup-local-libs
+display:
+	@echo "CXX_FLAGS: ${CXX_FLAGS}"
+
+.PHONY: all init-submodules clean setup build setup-local-libs
