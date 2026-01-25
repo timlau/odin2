@@ -1,0 +1,13 @@
+// Project-local debug tasks
+//
+// For more documentation on how to configure debug tasks,
+// see: https://zed.dev/docs/debugger
+[
+  {
+    "label": "Debug native binary",
+    "program": "$ZED_WORKTREE_ROOT/cmake-build-Odin2/Odin2_artefacts/Debug/Standalone/Odin2",
+    "request": "launch",
+    "adapter": "GDB",
+    "args": ["--debug", "--log", "--log-level", "debug"]
+  },
+]
