@@ -4,15 +4,15 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET 10.11 CACHE STRING "Minimum macOS version")
 project(Odin2 VERSION 2.4.1 LANGUAGES C CXX ASM)
 
 set(CMAKE_CXX_STANDARD 20)
-
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # ================== CMake Subdirs ======================
 
-  include(cmake/CPM.cmake)
-  # Dependencies
-  CPMAddPackage("gh:/juce-framework/JUCE#8.0.11")
-  CPMAddPackage("gh:/free-audio/clap-juce-extensions#main")
-  CPMAddPackage("gh:/surge-synthesizer/tuning-library#last_cpp17")
-  CPMAddPackage(
+include(cmake/CPM.cmake)
+# Dependencies
+CPMAddPackage("gh:/juce-framework/JUCE#8.0.11")
+CPMAddPackage("gh:/free-audio/clap-juce-extensions#main")
+CPMAddPackage("gh:/surge-synthesizer/tuning-library#last_cpp17")
+CPMAddPackage(
     NAME nlohmann_json
     GITHUB_REPOSITORY nlohmann/json
     VERSION 3.12.0
@@ -80,7 +80,7 @@ target_compile_definitions(Odin2
 )
 
 # ==================== Check OS =======================
-  target_include_directories(Odin2
+target_include_directories(Odin2
   PRIVATE
     ${CMAKE_BINARY_DIR}/include
     ${clap-juce-extensions}/include
