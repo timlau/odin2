@@ -19,6 +19,9 @@ setup:
 setup-local:
 	cmake -B ${BUILD_DIR} -S . -D CMAKE_BUILD_TYPE=${BUILD_TYPE} ${BUILD_OPTIONS} -DCPM_USE_LOCAL_PACKAGES=ON
 
+setup-debug:
+	cmake -B ${BUILD_DIR} -S . -D CMAKE_BUILD_TYPE=Debug ${BUILD_OPTIONS} -DCPM_USE_LOCAL_PACKAGES=ON
+
 build: setup
 	cmake --build ${BUILD_DIR} --config ${BUILD_TYPE}
 
@@ -30,6 +33,14 @@ build-standalone: setup-local
 
 build-clap: setup-local
 	cmake --build ${BUILD_DIR} --config ${BUILD_TYPE} --target ${NAME}_CLAP
+
+inst-clap: build-clap
+	@mkdir -p BUILDROOT
+	cmake --install ${BUILD_DIR} --config ${BUILD_TYPE} --component ${NAME}_CLAP --prefix BUILDROOT -v
+
+debug: 
+	cmake -B ${BUILD_DIR} -S . -D CMAKE_BUILD_TYPE=Debug ${BUILD_OPTIONS} -DCPM_USE_LOCAL_PACKAGES=ON
+	cmake --build ${BUILD_DIR} --config Debug --target ${NAME}_Standalone
 
 run:
 	./${BUILD_DIR}/Odin2_artefacts/${BUILD_TYPE}/Standalone/${NAME}
