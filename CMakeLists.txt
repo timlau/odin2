@@ -5,6 +5,7 @@ project(Odin2 VERSION 2.4.1 LANGUAGES C CXX ASM)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # ================== CMake Subdirs ======================
 
 include(cmake/CPM.cmake)
@@ -93,8 +94,10 @@ if(APPLE)
   target_compile_options(Odin2 PRIVATE "-Wno-implicit-float-conversion")
   message("== Building for MacOS")
 elseif(UNIX AND NOT APPLE)
+  message("== Building for Linux ${CMAKE_CXX_FLAGS_RELEASE}")
+  string(REPLACE "-Wp,-D_GLIBCXX_ASSERTIONS" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
   target_compile_definitions(Odin2 PRIVATE ODIN_LINUX=1)
-  message("== Building for Linux")
+  message("== Building for Linux ${CMAKE_CXX_FLAGS_RELEASE}")
 else()
   target_compile_definitions(Odin2 PRIVATE ODIN_WIN=1)
   message("== Building for Windows")
