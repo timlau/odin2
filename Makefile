@@ -2,7 +2,8 @@ NAME = Odin2
 BUILD_OPTIONS = -D ODIN2_COPY_PLUGIN_AFTER_BUILD=OFF
 BUILD_DIR = build
 BUILD_TYPE = Release
-CXX_FLAGS := "${CXX_FLAGS} -Wp,-D_GLIBCXX_ASSERTIONS"
+CXXFLAGS = $(shell rpm --eval '%{build_cxxflags}')
+BUILDROOT = $(shell pwd)/BUILDROOT
 
 
 all: build
@@ -22,8 +23,12 @@ setup-local:
 .PHONY: setup-local
 
 setup-debug:
-	cmake -B ${BUILD_DIR} -S . -D CMAKE_BUILD_TYPE=Debug ${BUILD_OPTIONS} -DCPM_USE_LOCAL_PACKAGES=ON
+	cmake -B ${BUILD_DIR} -S . -D CMAKE_BUILD_TYPE=Debug ${BUILD_OPTIONS} 
 .PHONY: setup-debug
+
+setup-rpm-flags:
+	CXXFLAGS="${CXXFLAGS}" cmake -B ${BUILD_DIR} -S . -D CMAKE_BUILD_TYPE=Release ${BUILD_OPTIONS} -DCPM_USE_LOCAL_PACKAGES=ON -DLIB_INSTALL_DIR:PATH=/usr/lib64 -DCMAKE_INSTALL_PREFIX:PATH=/usr
+.PHONY: setup-rpm-flag
 
 build: setup
 	cmake --build ${BUILD_DIR} --config ${BUILD_TYPE}
@@ -32,6 +37,10 @@ build: setup
 build-local: setup-local
 	cmake --build ${BUILD_DIR} --config ${BUILD_TYPE}
 .PHONY: build-local
+
+build-rpm-flags: setup-rpm-flags
+	cmake --build ${BUILD_DIR} --config Release 
+.PHONY: build-rpm-flags
 
 build-standalone: setup-local
 	cmake --build ${BUILD_DIR} --config ${BUILD_TYPE} --target ${NAME}_Standalone --verbose
@@ -57,3 +66,8 @@ run:
 run-debug:
 	./${BUILD_DIR}/Odin2_artefacts/Debug/Standalone/${NAME}
 .PHONY: run-debug
+
+install-buildroot:
+	@rm -rf ${BUILDROOT}
+	@mkdir -p {BUILDROOT}
+	DESTDIR=${BUILDROOT} cmake --install ${BUILD_DIR} --config Release 

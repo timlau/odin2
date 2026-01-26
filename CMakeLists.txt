@@ -34,7 +34,7 @@ endif()
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/include")
 file(WRITE "${CMAKE_BINARY_DIR}/include/GitCommitId.h" "#define GIT_COMMIT_ID \"${GIT_HASH}\"")
 
-option(ODIN2_COPY_PLUGIN_AFTER_BUILD "Copy JUCE Plugins after built" ON)
+option(ODIN2_COPY_PLUGIN_AFTER_BUILD "Copy JUCE Plugins after built" OFF)
 
 add_compile_definitions(
   JUCE_MODAL_LOOPS_PERMITTED
