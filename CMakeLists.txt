@@ -3,13 +3,15 @@ cmake_minimum_required(VERSION 3.15)
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.11 CACHE STRING "Minimum macOS version")
 project(Odin2 VERSION 2.4.1 LANGUAGES C CXX ASM)
 
+# Use C++ 20
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Enable compile commands export for IDEs
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# ================== CMake Subdirs ======================
-
+# Get external Dependencies with CPM
 include(cmake/CPM.cmake)
-# Dependencies
 CPMAddPackage("gh:/juce-framework/JUCE#8.0.11")
 CPMAddPackage("gh:/free-audio/clap-juce-extensions#main")
 CPMAddPackage("gh:/surge-synthesizer/tuning-library#last_cpp17")
@@ -34,6 +36,7 @@ endif()
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/include")
 file(WRITE "${CMAKE_BINARY_DIR}/include/GitCommitId.h" "#define GIT_COMMIT_ID \"${GIT_HASH}\"")
 
+# Copy plugins after build option
 option(ODIN2_COPY_PLUGIN_AFTER_BUILD "Copy JUCE Plugins after built" OFF)
 
 add_compile_definitions(
@@ -49,6 +52,7 @@ if(UNIX AND NOT APPLE)
   list(APPEND JUCE_FORMATS LV2)
 endif()
 
+# Basic Juce setup
 juce_add_plugin(Odin2
   VERSION "2.4.1"
   COMPANY_NAME "TheWaveWarden"
@@ -77,18 +81,17 @@ target_compile_definitions(Odin2
     JUCE_VST3_CAN_REPLACE_VST2=0
     JUCE_WEB_BROWSER=0
     JUCE_MODAL_LOOPS_PERMITTED=1
-    # JUCE_DISPLAY_SPLASH_SCREEN=0
 )
 
-# ==================== Check OS =======================
+# Setup include directories
 target_include_directories(Odin2
   PRIVATE
     ${CMAKE_BINARY_DIR}/include
-    #${clap-juce-extensions}/include
     ${tuning-library_SOURCE_DIR}
     ${nlohmann_json_SOURCE_DIR}/include
   )
 
+# Setup ODIN_<OS> defines
 if(APPLE)
   target_compile_definitions(Odin2 PRIVATE ODIN_MAC=1)
   target_compile_options(Odin2 PRIVATE "-Wno-implicit-float-conversion")
@@ -96,14 +99,12 @@ if(APPLE)
 elseif(UNIX AND NOT APPLE)
   message("== Building for Linux ")
   target_compile_definitions(Odin2 PRIVATE ODIN_LINUX=1)
-  target_compile_options(Odin2 PRIVATE  "-Wp,-U_GLIBCXX_ASSERTIONS")
 else()
   target_compile_definitions(Odin2 PRIVATE ODIN_WIN=1)
   message("== Building for Windows")
 endif()
 
 # ==================== Debug / Release =======================
-
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   message("== Building configuration Debug")
   target_compile_definitions(Odin2 PRIVATE ODIN_DEBUG=1)
@@ -218,7 +219,6 @@ target_sources(Odin2
 
 # ==================== Binary Files =======================
 add_subdirectory(assets)
-
 set_target_properties(Odin2_BinaryData PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
 # ==================== Linkage =======================
@@ -242,17 +242,17 @@ target_link_libraries(Odin2
     juce::juce_opengl
     juce::juce_recommended_config_flags
     juce::juce_recommended_lto_flags
-    #juce::juce_recommended_warning_flags
 )
 
 # ==================== Installation =======================
-
 include(GNUInstallDirs)
 
+# Install the standalone application
 if(TARGET ${PROJECT_NAME}_Standalone)
   install(TARGETS ${PROJECT_NAME}_Standalone DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
 
+# Install the native Juce plugins
 foreach(format VST3 LV2)
   if(TARGET ${PROJECT_NAME}_${format})
     get_target_property(output ${PROJECT_NAME}_${format} JUCE_PLUGIN_ARTEFACT_FILE)
@@ -260,9 +260,7 @@ foreach(format VST3 LV2)
   endif()
 endforeach()
 
+# Install the CLAP plugin
 if(TARGET ${PROJECT_NAME}_CLAP)
   install(TARGETS ${PROJECT_NAME}_CLAP DESTINATION ${CMAKE_INSTALL_LIBDIR}/clap)
 endif()
-
-
-
