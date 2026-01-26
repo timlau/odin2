@@ -84,7 +84,7 @@ target_compile_definitions(Odin2
 target_include_directories(Odin2
   PRIVATE
     ${CMAKE_BINARY_DIR}/include
-    ${clap-juce-extensions}/include
+    #${clap-juce-extensions}/include
     ${tuning-library_SOURCE_DIR}
     ${nlohmann_json_SOURCE_DIR}/include
   )
@@ -263,3 +263,6 @@ endforeach()
 if(TARGET ${PROJECT_NAME}_CLAP)
   install(TARGETS ${PROJECT_NAME}_CLAP DESTINATION ${CMAKE_INSTALL_LIBDIR}/clap)
 endif()
+
+
+
