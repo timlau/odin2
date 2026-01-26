@@ -25,11 +25,12 @@ void OdinAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &mi
 	// get BPM info from host
 	if (AudioPlayHead *playhead = getPlayHead()) {
 		auto current_position_info = playhead->getPosition();
-		if (current_position_info) {
-			if (m_BPM != *current_position_info->getBpm()) {
+		if (current_position_info.hasValue()) {
+		auto cur_BPM = current_position_info->getBpm().orFallback(120.0);
+		if (m_BPM != cur_BPM) {
 				m_value_tree.state.getChildWithName("misc").setProperty("BPM", m_BPM, nullptr);
 			}
-			m_BPM = *current_position_info->getBpm();
+			m_BPM = cur_BPM;
 		}
 	}
 	setBPM(m_BPM);
